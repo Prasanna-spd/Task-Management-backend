@@ -1,6 +1,7 @@
 import express from "express";
 import userRouter from "./routes/user.js";
 import taskRouter from "./routes/task.js";
+import projectRouter from "./routes/project.js";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -27,6 +28,7 @@ connectDB();
 
 app.use("/api/users", userRouter);
 app.use("/api/task", taskRouter);
+app.use("/api/projects", projectRouter);
 
 app.get("/", (req, res) => {
   res.send("Nice working");
