@@ -4,6 +4,7 @@ import taskRouter from "./routes/task.js";
 import projectRouter from "./routes/project.js";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
+import { errorMiddleware } from "./middlewares/error.js";
 import cors from "cors";
 import { connectDB } from "./data/database.js";
 const PORT = process.env.PORT || 5000;
@@ -13,6 +14,8 @@ const app = express();
 // config({
 //   path: ".env",
 // });
+
+config();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -37,3 +40,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is working on port:${PORT}.`);
 });
+
+app.use(errorMiddleware);

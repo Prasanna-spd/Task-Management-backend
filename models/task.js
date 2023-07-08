@@ -13,6 +13,14 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  inProgress: {
+    type: Boolean,
+    default: false,
+  },
+  notStarted: {
+    type: Boolean,
+    default: false,
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

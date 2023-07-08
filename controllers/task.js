@@ -59,8 +59,10 @@ export const deleteTask = async (req, res, next) => {
     const task = await Task.findById(req.params.id);
 
     const project = await Project.findOne({
-      employees: req.params.id,
+      employees: req.user._id,
     });
+
+    console.log(project);
 
     if (!project) {
       return next(
@@ -86,14 +88,59 @@ export const deleteTask = async (req, res, next) => {
   }
 };
 
+// export const updateTask = async (req, res, next) => {
+//   try {
+//     const task = await Task.findById(req.params.id);
+
+//     if (!task) return next(new ErrorHandler("Task not found", 404));
+
+//     const project = await Project.findOne({
+//       employees: req.user._id,
+//     });
+
+//     if (!project) {
+//       return next(
+//         new ErrorHandler(
+//           "Project not found or you are not authorized to update this task",
+//           404
+//         )
+//       );
+//     }
+
+//     const originalIsCompleted = task.isCompleted;
+
+//     task[req.body.field] = !task[req.body.field];
+//     await task.save();
+
+//     // Update the subtasks count in the associated project
+//     if (originalIsCompleted !== task.isCompleted) {
+//       if (task.isCompleted) {
+//         project.subtasks += 1;
+//       } else {
+//         project.subtasks -= 1;
+//       }
+
+//       await project.save();
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Task Updated!",
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const updateTask = async (req, res, next) => {
   try {
+    const { isCompleted, inProgress, notStarted } = req.body;
     const task = await Task.findById(req.params.id);
 
     if (!task) return next(new ErrorHandler("Task not found", 404));
 
     const project = await Project.findOne({
-      employees: req.params.id,
+      employees: req.user._id,
     });
 
     if (!project) {
@@ -104,22 +151,50 @@ export const updateTask = async (req, res, next) => {
         )
       );
     }
+    task.isCompleted = isCompleted;
+    task.inProgress = inProgress;
+    task.notStarted = notStarted;
 
-    const originalIsCompleted = task.isCompleted;
-
-    task.isCompleted = !task.isCompleted;
     await task.save();
 
     // Update the subtasks count in the associated project
-    if (originalIsCompleted !== task.isCompleted) {
+    if (task.isCompleted !== undefined && task.isCompleted !== null) {
       if (task.isCompleted) {
-        project.subtasks += 1;
+        project.isCompleted += 1;
       } else {
-        project.subtasks -= 1;
+        if (project.isCompleted > 0) {
+          project.isCompleted -= 1;
+        } else {
+          project.isCompleted = 0;
+        }
       }
-
-      await project.save();
     }
+
+    if (task.inProgress !== undefined && task.inProgress !== null) {
+      if (task.inProgress) {
+        project.inProgress += 1;
+      } else {
+        if (project.inProgress > 0) {
+          project.inProgress -= 1;
+        } else {
+          project.inProgress = 0;
+        }
+      }
+    }
+
+    if (task.notStarted !== undefined && task.notStarted !== null) {
+      if (task.notStarted) {
+        project.notStarted += 1;
+      } else {
+        if (project.notStarted > 0) {
+          project.notStarted -= 1;
+        } else {
+          project.notStarted = 0;
+        }
+      }
+    }
+
+    await project.save();
 
     res.status(200).json({
       success: true,

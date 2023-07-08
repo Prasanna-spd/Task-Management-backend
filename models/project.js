@@ -10,13 +10,26 @@ const projectSchema = new mongoose.Schema({
     required: true,
   },
   timeDue: {
-    type: Date,
+    type: String,
     required: true,
   },
   subtasks: {
     type: Number,
     default: 0,
   },
+  isCompleted: {
+    type: Number,
+    default: 0,
+  },
+  inProgress: {
+    type: Number,
+    default: 0,
+  },
+  notStarted: {
+    type: Number,
+    default: 0,
+  },
+
   employees: [
     {
       type: mongoose.Schema.Types.ObjectId,
