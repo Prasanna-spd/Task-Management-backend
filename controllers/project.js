@@ -111,3 +111,41 @@ export const subscribe = async (req, res) => {
     });
   }
 };
+
+export const getSubscribedProjects = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    console.log(userId);
+    const subscribedProjects = await Project.find({ employees: userId });
+
+    if (subscribedProjects.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No subscribed projects found for the user" });
+    }
+
+    res.status(200).json({ projects: subscribedProjects });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getProgress = async (req, res) => {
+  const projectId = req.params.id;
+
+  try {
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    const { isCompleted, inProgress, notStarted } = project;
+
+    res.status(200).json({ isCompleted, inProgress, notStarted });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
