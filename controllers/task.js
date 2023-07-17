@@ -134,7 +134,7 @@ export const deleteTask = async (req, res, next) => {
 
 export const updateTask = async (req, res, next) => {
   try {
-    const { isCompleted, inProgress, notStarted } = req.body;
+    const { isCompleted, inProgress } = req.body;
     const task = await Task.findById(req.params.id);
 
     if (!task) return next(new ErrorHandler("Task not found", 404));
@@ -142,7 +142,7 @@ export const updateTask = async (req, res, next) => {
     const project = await Project.findOne({
       employees: req.user._id,
     });
-
+    console.log(project);
     if (!project) {
       return next(
         new ErrorHandler(
@@ -153,7 +153,6 @@ export const updateTask = async (req, res, next) => {
     }
     task.isCompleted = isCompleted;
     task.inProgress = inProgress;
-    task.notStarted = notStarted;
 
     await task.save();
 
@@ -172,24 +171,16 @@ export const updateTask = async (req, res, next) => {
 
     if (task.inProgress !== undefined && task.inProgress !== null) {
       if (task.inProgress) {
-        project.inProgress += 1;
+        if (project.inProgress < 10) {
+          project.inProgress += 1;
+        } else {
+          project.inProgress = 10;
+        }
       } else {
         if (project.inProgress > 0) {
           project.inProgress -= 1;
         } else {
           project.inProgress = 0;
-        }
-      }
-    }
-
-    if (task.notStarted !== undefined && task.notStarted !== null) {
-      if (task.notStarted) {
-        project.notStarted += 1;
-      } else {
-        if (project.notStarted > 0) {
-          project.notStarted -= 1;
-        } else {
-          project.notStarted = 0;
         }
       }
     }

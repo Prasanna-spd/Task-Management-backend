@@ -23,11 +23,7 @@ const projectSchema = new mongoose.Schema({
   },
   inProgress: {
     type: Number,
-    default: 0,
-  },
-  notStarted: {
-    type: Number,
-    default: 0,
+    default: 10,
   },
 
   employees: [
